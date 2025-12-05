@@ -1,0 +1,6 @@
+[report]
+fail-under = 100
+
+[config]
+command = "Test"
+run-types = ["Tests", "Bins"]

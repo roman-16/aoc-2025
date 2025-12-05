@@ -56,12 +56,18 @@ Advent of Code 2025 puzzle solutions in Rust:
 - **Purpose**: Daily programming puzzles (December 1-25)
 - **Structure**: Each day has two parts with increasing difficulty
 - **Input**: Each puzzle has unique input data per user
+- **Testing**: Built-in Rust test framework with `#[cfg(test)]` modules
+- **Coverage**: cargo-tarpaulin with 100% minimum threshold
 
 ## Project Structure
 Key directories:
 - `src/` - Main source code
-- `src/bin/` - Individual day solutions (day01.rs, day02.rs, etc.)
-- `inputs/` - Puzzle input files
+- `src/main.rs` - Entry point (prints greeting)
+- `src/bin/` - Individual day solutions (day01/, day02/, etc.)
+- `src/bin/dayXX/main.rs` - Day solution code with tests
+- `src/bin/dayXX/input.txt` - Puzzle input (co-located with code)
+- `docs/` - Documentation and feature files
+- `docs/features/` - Feature documentation files
 
 ## Code Style
 
@@ -94,17 +100,33 @@ Key directories:
 - **TODOs**: `// TODO:` with context (optional ticket ref)
 - **Doc Comments**: Use `///` for public APIs
 
+### Config & Environment
+- **Config**: Env vars only, no secrets in code
+
 ### Error Handling & Logging
 - **Errors**: Use `Result<T, E>` consistently. Provide context with `.context()` or custom error types
 - **Panics**: Avoid in library code. Use only for unrecoverable states or test assertions
 
+### Testing
+- **Approach**: Write tests alongside implementation
+- **Location**: Co-located in same file using `#[cfg(test)]` module
+- **Coverage**: Minimum 100% via cargo-tarpaulin
+- **Test Types**:
+  - Example input tests (from puzzle description)
+  - Edge case tests (large inputs, boundary conditions)
+  - Panic tests with `#[should_panic(expected = "...")]`
+  - Main function execution tests
+- **Test Quality**:
+  - Test behavior, not implementation details
+  - Use descriptive test names: `test_part1_example`, `test_part2_large_rotation`
+  - Extract shared test data to constants: `const EXAMPLE: &str = "..."`
+
 ## Quality Gates
 Run in this order to fail fast:
 
-1. Code must compile with no errors (`cargo build`)
-2. Clippy lints must pass (`cargo clippy -- -D warnings`)
-3. Format must be correct (`cargo fmt --check`)
-4. All tests must pass (`cargo test`)
+1. Code must compile with no errors (`just build`)
+2. Lints must pass, clippy and check formatting (`just lint`)
+3. All tests must pass and test coverage must meet minimum 100% threshold (`just test`)
 
 ## Version Control
 
@@ -150,9 +172,8 @@ Run in this order to fail fast:
 - **Scope**: day01-day25, utils, lib
 
 ## Commands
-- **Build**: `cargo build` (debug) | `cargo build --release` (optimized)
-- **Run**: `cargo run --bin dayXX` (replace XX with day number)
-- **Check**: `cargo check` (fast compile check without codegen)
-- **Lint**: `cargo clippy -- -D warnings`
-- **Format**: `cargo fmt` (apply) | `cargo fmt --check` (verify)
-- **Test**: `cargo test`
+- **Build**: `just build` (release) | `just dev dayXX` (development)
+- **Lint**: `just lint`
+- **Test**: `just test`
+- **Watch**: `just watch dayXX` - Watch mode with bacon
+- **Check**: `just check` - Run all quality gates (build, lint, test)

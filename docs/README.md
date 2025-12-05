@@ -7,14 +7,17 @@ Rust solutions for [Advent of Code 2025](https://adventofcode.com/2025).
 ```
 aoc-2025/
 ├── src/
-│   ├── main.rs          # Main entry point
-│   └── bin/             # Daily solutions (day01.rs, day02.rs, etc.)
+│   ├── main.rs              # Entry point
+│   └── bin/
+│       └── dayXX/
+│           ├── main.rs      # Day solution
+│           └── input.txt    # Puzzle input (co-located)
 ├── docs/
-│   └── features/        # Feature documentation
-├── devbox.json          # Dev environment config
-├── justfile             # Task runner commands
-├── rust-toolchain.toml  # Rust stable channel
-└── rustfmt.toml         # Formatter config
+│   └── features/            # Feature documentation
+├── devbox.json              # Dev environment config
+├── justfile                 # Task runner commands
+├── rust-toolchain.toml      # Rust stable channel
+└── tarpaulin.toml           # Coverage config (100% threshold)
 ```
 
 ## Development Environment
@@ -28,13 +31,22 @@ Uses [devbox](https://www.jetify.com/devbox) with:
 ## Commands
 
 ```sh
-cargo build              # Build project
-cargo run --bin dayXX    # Run specific day
-cargo test               # Run tests
-cargo clippy             # Lint
-cargo fmt                # Format code
+just dev dayXX           # Run a specific day
+just watch dayXX         # Watch mode with bacon
+just check               # Run all quality gates
+just test                # Run tests with coverage
+just lint                # Format and lint
 ```
 
-## Status
+## Quality Gates
 
-Project initialized and ready for puzzle solutions.
+1. `cargo build` - compilation
+2. `cargo clippy -- -D warnings` - lints
+3. `cargo fmt --check` - formatting
+4. `cargo tarpaulin` - tests with 100% coverage
+
+## Progress
+
+| Day | Part 1 | Part 2 |
+|-----|--------|--------|
+| 01  | 1105   | 6599   |

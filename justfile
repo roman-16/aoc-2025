@@ -9,14 +9,18 @@ build:
 # Run all quality gates
 check: build lint test
 
-# Watch for changes with bacon
-dev:
-    bacon run -- -q
+# Run a binary (e.g., just dev day01)
+dev bin="aoc-2025":
+    cargo run --bin {{bin}}
 
-# Run clippy and check formatting
+# Watch and re-run on changes (e.g., just watch day01)
+watch bin="aoc-2025":
+    bacon run -- --bin {{bin}}
+
+# Format code and run clippy
 lint:
+    cargo fmt
     cargo clippy -- -D warnings
-    cargo fmt --check
 
 # Run all tests with coverage
 test:
