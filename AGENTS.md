@@ -112,7 +112,6 @@ Key directories:
 - **Location**: Co-located in same file using `#[cfg(test)]` module
 - **Coverage**: Minimum 100% via cargo-tarpaulin
 - **Test Types**:
-  - Example input tests (from puzzle description)
   - Edge case tests (large inputs, boundary conditions)
   - Panic tests with `#[should_panic(expected = "...")]`
   - Main function execution tests
