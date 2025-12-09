@@ -6,19 +6,12 @@ fn main() {
 
 fn solve_part1(input: &str) -> usize {
     let grid: Vec<&[u8]> = input.trim().lines().map(|line| line.as_bytes()).collect();
-
-    let rows = grid.len();
     let cols = grid.first().map_or(0, |row| row.len());
 
-    let mut count = 0;
-    for row in 0..rows {
-        for col in 0..cols {
-            if grid[row][col] == b'@' && count_adjacent_rolls(&grid, row, col) < 4 {
-                count += 1;
-            }
-        }
-    }
-    count
+    (0..grid.len())
+        .flat_map(|row| (0..cols).map(move |col| (row, col)))
+        .filter(|&(row, col)| grid[row][col] == b'@' && count_adjacent_rolls(&grid, row, col) < 4)
+        .count()
 }
 
 fn solve_part2(input: &str) -> usize {
@@ -46,72 +39,28 @@ fn solve_part2(input: &str) -> usize {
 }
 
 fn find_accessible_rolls(grid: &[Vec<u8>]) -> Vec<(usize, usize)> {
-    let rows = grid.len();
     let cols = grid.first().map_or(0, |row| row.len());
 
-    let mut accessible = Vec::new();
-    for row in 0..rows {
-        for col in 0..cols {
-            if grid[row][col] == b'@' && count_adjacent_rolls_mut(grid, row, col) < 4 {
-                accessible.push((row, col));
-            }
-        }
-    }
-    accessible
+    (0..grid.len())
+        .flat_map(|row| (0..cols).map(move |col| (row, col)))
+        .filter(|&(row, col)| grid[row][col] == b'@' && count_adjacent_rolls(grid, row, col) < 4)
+        .collect()
 }
 
-fn count_adjacent_rolls_mut(grid: &[Vec<u8>], row: usize, col: usize) -> usize {
+fn count_adjacent_rolls<R: AsRef<[u8]>>(grid: &[R], row: usize, col: usize) -> usize {
     let rows = grid.len();
-    let cols = grid.first().map_or(0, |r| r.len());
+    let cols = grid.first().map_or(0, |r| r.as_ref().len());
 
-    let mut count = 0;
-    for dr in [-1i32, 0, 1] {
-        for dc in [-1i32, 0, 1] {
-            if dr == 0 && dc == 0 {
-                continue;
-            }
-
-            let new_row = row as i32 + dr;
-            let new_col = col as i32 + dc;
-
-            if new_row >= 0
-                && new_row < rows as i32
-                && new_col >= 0
-                && new_col < cols as i32
-                && grid[new_row as usize][new_col as usize] == b'@'
-            {
-                count += 1;
-            }
-        }
-    }
-    count
-}
-
-fn count_adjacent_rolls(grid: &[&[u8]], row: usize, col: usize) -> usize {
-    let rows = grid.len();
-    let cols = grid.first().map_or(0, |r| r.len());
-
-    let mut count = 0;
-    for dr in [-1i32, 0, 1] {
-        for dc in [-1i32, 0, 1] {
-            if dr == 0 && dc == 0 {
-                continue;
-            }
-
-            let new_row = row as i32 + dr;
-            let new_col = col as i32 + dc;
-
-            if new_row >= 0
-                && new_row < rows as i32
-                && new_col >= 0
-                && new_col < cols as i32
-                && grid[new_row as usize][new_col as usize] == b'@'
-            {
-                count += 1;
-            }
-        }
-    }
-    count
+    (-1i32..=1)
+        .flat_map(|dr| (-1i32..=1).map(move |dc| (dr, dc)))
+        .filter(|&(dr, dc)| dr != 0 || dc != 0)
+        .filter_map(|(dr, dc)| {
+            let new_row = row.checked_add_signed(dr as isize)?;
+            let new_col = col.checked_add_signed(dc as isize)?;
+            (new_row < rows && new_col < cols).then_some((new_row, new_col))
+        })
+        .filter(|&(r, c)| grid[r].as_ref()[c] == b'@')
+        .count()
 }
 
 #[cfg(test)]

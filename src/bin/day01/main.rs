@@ -4,20 +4,32 @@ fn main() {
     println!("Part 2: {}", solve_part2(input));
 }
 
+fn parse_moves(input: &str) -> impl Iterator<Item = (bool, i32)> + '_ {
+    input.lines().map(|line| {
+        let (direction, distance) = line.split_at(1);
+        let is_left = match direction {
+            "L" => true,
+            "R" => false,
+            _ => panic!("Invalid direction: {direction}"),
+        };
+        (is_left, distance.parse().unwrap())
+    })
+}
+
+fn apply_move(position: i32, distance: i32, is_left: bool) -> i32 {
+    if is_left {
+        (position - distance).rem_euclid(100)
+    } else {
+        (position + distance).rem_euclid(100)
+    }
+}
+
 fn solve_part1(input: &str) -> usize {
     let mut position: i32 = 50;
     let mut count = 0;
 
-    for line in input.lines() {
-        let (direction, distance) = line.split_at(1);
-        let distance: i32 = distance.parse().unwrap();
-
-        position = match direction {
-            "L" => (position - distance).rem_euclid(100),
-            "R" => (position + distance).rem_euclid(100),
-            _ => panic!("Invalid direction: {direction}"),
-        };
-
+    for (is_left, distance) in parse_moves(input) {
+        position = apply_move(position, distance, is_left);
         if position == 0 {
             count += 1;
         }
@@ -30,16 +42,9 @@ fn solve_part2(input: &str) -> i32 {
     let mut position: i32 = 50;
     let mut count = 0;
 
-    for line in input.lines() {
-        let (direction, distance) = line.split_at(1);
-        let distance: i32 = distance.parse().unwrap();
-
-        count += count_zeros(position, distance, direction == "L");
-        position = match direction {
-            "L" => (position - distance).rem_euclid(100),
-            "R" => (position + distance).rem_euclid(100),
-            _ => panic!("Invalid direction: {direction}"),
-        };
+    for (is_left, distance) in parse_moves(input) {
+        count += count_zeros(position, distance, is_left);
+        position = apply_move(position, distance, is_left);
     }
 
     count
